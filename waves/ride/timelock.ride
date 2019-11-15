@@ -1,0 +1,143 @@
+{-# STDLIB_VERSION 3 #-}
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+let assetId = unit
+let oneMonth = 43800 # the number of blocks in ~1 month
+let accessDeniedMessage = "Only the timelock owner can call this function"
+
+func owner() = {
+    match getString(this, "timelockOwner") {
+        case a:String => a
+        case _ => toBase58String(this.bytes)
+    }
+}
+
+func checkOwner(callerBytes: ByteVector) = {
+    toBase58String(callerBytes) == owner()
+}
+
+func getInt(key: String) = {
+    match getInteger(this, key) {
+        case a:Int => a
+        case _ => 0
+    }
+}
+
+func settleWithdrawal(amount: Int, shouldUnlock: Boolean) = {
+    let storedAmount = getInt("storedAmount")
+    let amountClaimed = getInt("amountClaimed")
+    let newAmount = storedAmount - amount
+
+    if (amount < 0)
+        then throw("Can't withdraw negative amount")
+    else if (newAmount < 0)
+        then throw("Not enough balance")
+    else ScriptResult(
+            WriteSet([
+                DataEntry("locked", !shouldUnlock),
+                DataEntry("storedAmount", newAmount),
+                DataEntry("amountClaimed", amountClaimed + amount)
+            ]),
+            TransferSet([ScriptTransfer(addressFromStringValue(owner()), amount, unit)])
+        )
+}
+
+@Callable(i)
+func deposit() = {
+    let locked = match getBoolean(this, "locked") {
+        case a:Boolean => a
+        case _ => false
+    }
+
+    if (locked == true) then throw("Can't deposit funds after it is locked")
+    else {
+        let pmt = extract(i.payment)
+        if (pmt.assetId != assetId) then throw("Only the predefined asset can be locked")
+        else {
+            let storedAmount = getInt("storedAmount")
+            let newAmount = storedAmount + pmt.amount
+            WriteSet([DataEntry("storedAmount", newAmount)])
+        }
+    }
+}
+
+@Callable(i)
+func timelock(chunks: Int, interval: Int, initialDelay: Int) = {
+    if (!checkOwner(i.caller.bytes)) then throw(accessDeniedMessage)
+    else {
+        let locked = match getBoolean(this, "locked") {
+            case a:Boolean => a
+            case _ => false
+        }
+        if (locked == true) then throw("Lock already in place")
+        else {
+            let fiveYears = oneMonth * 60;
+            let timelockPeriod = (chunks * interval) + initialDelay;
+            if (timelockPeriod > fiveYears) then throw("This contract has an upper limit of 5 years that funds can be locked")
+            else {
+                let storedAmount = getInt("storedAmount");
+                if (storedAmount < chunks) then throw("There are not enough funds to lock")
+                else {
+                    WriteSet([
+                        DataEntry("locked", true),
+                        DataEntry("lockBlock", height),
+                        DataEntry("initialDelay", initialDelay),
+                        DataEntry("lockInterval", interval),
+                        DataEntry("totalChunks", chunks),
+                        DataEntry("lockedAmount", storedAmount),
+                        DataEntry("amountClaimed", 0)
+                    ])
+                }
+            }
+        }
+    }
+    
+}
+
+
+@Callable(i)
+func withdraw(amount: Int) = {
+    if (!checkOwner(i.caller.bytes)) then throw(accessDeniedMessage)
+    else {
+        let locked = match getBoolean(this, "locked") {
+            case a:Boolean => a
+            case _ => false
+        }
+
+        if (locked == false) then settleWithdrawal(amount, true)
+        else {
+            let lockBlock = getInt("lockBlock")
+            let initialDelay = getInt("initialDelay")
+            let lockInterval = getInt("lockInterval")
+            let totalChunks = getInt("totalChunks")
+            let lockedAmount = getInt("lockedAmount")
+            let amountClaimed = getInt("amountClaimed")
+
+            let startingBlock = lockBlock + initialDelay
+            let blocksElapsed = height - startingBlock
+            let chunksElapsed = blocksElapsed / lockInterval
+            let amountPerChunk = lockedAmount / totalChunks
+            let amountAvailable = amountPerChunk * chunksElapsed
+            let withdrawalAmount = amountAvailable - amountClaimed;
+
+            if (withdrawalAmount <= 0) then throw("All funds are currently locked")
+            else settleWithdrawal(withdrawalAmount, chunksElapsed >= totalChunks)
+        }
+    }
+}
+
+@Verifier(tx)
+func verify() = {
+    match tx {
+        case t: DataTransaction => 
+            let locked = match getBoolean(this, "locked") {
+                case a:Boolean => a
+                case _ => false
+            }
+            !locked
+        case _ => false
+    }
+}
+
+
