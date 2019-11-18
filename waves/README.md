@@ -1,10 +1,11 @@
 # Asset Time Lock
-_Allows deposited funds to be locked up and released in chunks on a time schedule_
+_Allows deposited funds to be locked up and released in chunks on a block schedule_
 
 ## Usage
 
-1. Set the timelock script (`./ride/timelock.ride`) to a newly generated account _see [SetScript Transaction](https://docs.wavesplatform.com/en/blockchain/transaction-type/set-script-transaction.html)_
-2. All deposited funds are returned to a single address, this is derived from the `timelockOwner` data on the smart account, please set this to your desired **Address** _see [Data Transaction](https://docs.wavesplatform.com/en/blockchain/transaction-type/data-transaction.html)_
+1. Set the timelock script (`./ride/timelock.ride`) to an account. _see [SetScript Transaction](https://docs.wavesplatform.com/en/blockchain/transaction-type/set-script-transaction.html)_
+2. With the dApp ready, you have a destination where you can deposit funds to that can be locked.
+2. All deposited funds are returned to a single address, this address is derived from the `timelockOwner` data on the smart account, please set this to your desired **Address**. _see [Data Transaction](https://docs.wavesplatform.com/en/blockchain/transaction-type/data-transaction.html)_
 3. Once everything is set, call the `deposit` function to add funds you intend to lock up (ensure the predefined `assetId` corresponds to the asset being deposited)
 4. With all the funds in place, you may now call the `timelock` function, which will irreversibly lock the funds and begin the release schedule
 5. Unlocked funds can be retrieved by calling the `withdraw` function
@@ -25,8 +26,10 @@ _Dependencies_:
 - [surfboard](https://www.npmjs.com/package/@waves/surfboard)
 - [waves-private-node](https://hub.docker.com/r/wavesplatform/waves-private-node)
 
-Unlike most testing suites, the timelock test suite waits for blocks to elapse in real-time.. Mocked functions/values were avoided to keep all transactions included in the unit tests as explorable on-chain data.
-The unit tests will connect to a local node running on the machine (where the dApp was deployed) to check block height as needed.
+_Unlike most testing suites, the timelock test suite waits for blocks to elapse in real-time.. Mocked functions/values were avoided to keep all transactions included in the unit tests as explorable on-chain data.
+The unit tests will connect to a local node running on the machine (where the dApp was deployed) to check block height as needed._
+
+- run `surfboard test` from the `waves` directory
 
 ## Credits
 
