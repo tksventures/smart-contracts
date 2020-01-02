@@ -13,6 +13,12 @@
             "CHAIN_ID": "T",
             "SEED": "slight bonus jaguar forum series observe diet seek item faculty labor depend",
             "timeout": 60000
+        },
+        "mainnet": {
+            "API_BASE": "https://nodes.wavesnodes.com/",
+            "CHAIN_ID": 87,
+            "SEED": "slight bonus jaguar forum series observe diet seek item faculty labor depend",
+            "timeout": 60000
         }
     },
     "defaultEnv": "custom",
