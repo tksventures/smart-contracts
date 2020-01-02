@@ -39,7 +39,7 @@ func settleWithdrawal(amount: Int, shouldUnlock: Boolean) = {
                 DataEntry("storedAmount", newAmount),
                 DataEntry("amountClaimed", amountClaimed + amount)
             ]),
-            TransferSet([ScriptTransfer(addressFromStringValue(owner()), amount, unit)])
+            TransferSet([ScriptTransfer(addressFromStringValue(owner()), amount, assetId)])
         )
 }
 
@@ -98,39 +98,36 @@ func timelock(chunks: Int, interval: Int, initialDelay: Int) = {
 
 @Callable(i)
 func withdraw(amount: Int) = {
-    if (!checkOwner(i.caller.bytes)) then throw(accessDeniedMessage)
+    let locked = match getBoolean(this, "locked") {
+        case a:Boolean => a
+        case _ => false
+    }
+
+    if (locked == false) then settleWithdrawal(amount, true)
     else {
-        let locked = match getBoolean(this, "locked") {
-            case a:Boolean => a
-            case _ => false
-        }
+        let lockBlock = getInt("lockBlock")
+        let initialDelay = getInt("initialDelay")
+        let lockInterval = getInt("lockInterval")
+        let totalChunks = getInt("totalChunks")
+        let lockedAmount = getInt("lockedAmount")
+        let amountClaimed = getInt("amountClaimed")
 
-        if (locked == false) then settleWithdrawal(amount, true)
-        else {
-            let lockBlock = getInt("lockBlock")
-            let initialDelay = getInt("initialDelay")
-            let lockInterval = getInt("lockInterval")
-            let totalChunks = getInt("totalChunks")
-            let lockedAmount = getInt("lockedAmount")
-            let amountClaimed = getInt("amountClaimed")
+        let startingBlock = lockBlock + initialDelay
+        let blocksElapsed = height - startingBlock
+        let chunksElapsed = blocksElapsed / lockInterval
+        let amountPerChunk = lockedAmount / totalChunks
+        let amountAvailable = amountPerChunk * chunksElapsed
+        let withdrawalAmount = amountAvailable - amountClaimed;
 
-            let startingBlock = lockBlock + initialDelay
-            let blocksElapsed = height - startingBlock
-            let chunksElapsed = blocksElapsed / lockInterval
-            let amountPerChunk = lockedAmount / totalChunks
-            let amountAvailable = amountPerChunk * chunksElapsed
-            let withdrawalAmount = amountAvailable - amountClaimed;
-
-            if (withdrawalAmount <= 0) then throw("All funds are currently locked")
-            else settleWithdrawal(withdrawalAmount, chunksElapsed >= totalChunks)
-        }
+        if (withdrawalAmount <= 0) then throw("All funds are currently locked")
+        else settleWithdrawal(withdrawalAmount, chunksElapsed >= totalChunks)
     }
 }
 
 @Verifier(tx)
 func verify() = {
     match tx {
-        case t: DataTransaction => 
+        case t: DataTransaction | TransferTransaction => 
             let locked = match getBoolean(this, "locked") {
                 case a:Boolean => a
                 case _ => false
