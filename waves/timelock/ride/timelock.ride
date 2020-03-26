@@ -2,7 +2,7 @@
 {-# CONTENT_TYPE DAPP #-}
 {-# SCRIPT_TYPE ACCOUNT #-}
 
-let assetId = unit
+let assetId = base58'7N8pvtrndGbdWsaPbyULRa7g3ESn21aayVvsz3Q3VVj4'
 let oneMonth = 43800 # the number of blocks in ~1 month
 let accessDeniedMessage = "Only the timelock owner can call this function"
 
