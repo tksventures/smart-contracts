@@ -100,14 +100,14 @@ contract CLPPSToken {
       return true;
   }
 
-  function burn(address sender, uint numTokens)
+  function burn(uint numTokens)
     public
     returns (bool) {
-      require(numTokens <= balances[sender], "Insufficient Tokens");
+      require(numTokens <= balances[msg.sender], "Insufficient Tokens");
 
-      balances[sender] = balances[sender].sub(numTokens);
+      balances[msg.sender] = balances[msg.sender].sub(numTokens);
       totalSupply_ = totalSupply_.sub(numTokens);
-      emit Burn(sender, numTokens);
+      emit Burn(msg.sender, numTokens);
       return true;
   }
 }
