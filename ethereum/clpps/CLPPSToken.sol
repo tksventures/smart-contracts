@@ -49,6 +49,8 @@ contract CLPPSToken {
 
   function transfer(address receiver, uint numTokens) public returns (bool) {
     require(numTokens <= balances[msg.sender], "Insufficient Tokens");
+    require(receiver != address(0), "Receiver address is undefined");
+
     balances[msg.sender] = balances[msg.sender].sub(numTokens);
     balances[receiver] = balances[receiver].add(numTokens);
     emit Transfer(msg.sender, receiver, numTokens);
@@ -56,6 +58,9 @@ contract CLPPSToken {
   }
 
   function approve(address delegate, uint numTokens) public returns (bool) {
+    require(delegate != address(0), "Delegate address is undefined");
+    require((numTokens == 0) || (allowed[msg.sender][delegate] == 0), "To change the approval, you must first reduce the allowance to zero.");
+
     allowed[msg.sender][delegate] = numTokens;
     emit Approval(msg.sender, delegate, numTokens);
     return true;
@@ -97,6 +102,18 @@ contract CLPPSToken {
       balances[receiver] = balances[receiver].add(numTokens);
       totalSupply_ = totalSupply_.add(numTokens);
       emit Mint(receiver, numTokens);
+      return true;
+  }
+
+  function burnFrom(address owner, uint numTokens)
+    public
+    onlyAdmin
+    returns (bool) {
+      require(numTokens <= balances[owner], "Insufficient Tokens");
+
+      balances[owner] = balances[owner].sub(numTokens);
+      totalSupply_ = totalSupply_.sub(numTokens);
+      emit Burn(owner, numTokens);
       return true;
   }
 
