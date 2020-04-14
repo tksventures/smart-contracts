@@ -14,9 +14,6 @@ library SafeMath {
 }
 
 contract CLPPSToken {
-  string public constant name = "CLPPSToken";
-  string public constant symbol = "CLPPS";
-  uint8 public constant decimals = 18;
   address payable public clppsAdmin; // Address with privileges to mint new tokens
 
   constructor(uint256 total, address payable admin) public {
@@ -28,6 +25,10 @@ contract CLPPSToken {
   /****
   * ERC-20 Compliant Interface
   ****/
+  string public constant name = "CLPPSToken";
+  string public constant symbol = "CLPPS";
+  uint8 public constant decimals = 18;
+
   event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
   event Transfer(address indexed from, address indexed to, uint tokens);
 
@@ -84,6 +85,8 @@ contract CLPPSToken {
   /****
   * Mint-and-Burn functionality
   ****/
+  uint256 burnedSupply_;
+
   event Mint(address indexed to, uint tokens);
   event Burn(address indexed from, uint tokens);
 
@@ -113,6 +116,8 @@ contract CLPPSToken {
 
       balances[owner] = balances[owner].sub(numTokens);
       totalSupply_ = totalSupply_.sub(numTokens);
+      burnedSupply_ = burnedSupply_.add(numTokens);
+
       emit Burn(owner, numTokens);
       return true;
   }
@@ -124,7 +129,13 @@ contract CLPPSToken {
 
       balances[msg.sender] = balances[msg.sender].sub(numTokens);
       totalSupply_ = totalSupply_.sub(numTokens);
+      burnedSupply_ = burnedSupply_.add(numTokens);
+
       emit Burn(msg.sender, numTokens);
       return true;
+  }
+
+  function burnedSupply() public view returns (uint256) {
+	  return burnedSupply_;
   }
 }
