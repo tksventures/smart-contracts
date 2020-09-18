@@ -1,0 +1,28 @@
+{
+    "ride_directory": "ride",
+    "test_directory": "test",
+    "envs": {
+        "custom": {
+            "API_BASE": "http://localhost:6869/",
+            "CHAIN_ID": "R",
+            "SEED": "waves private node seed with waves tokens",
+            "timeout": 60000
+        },
+        "testnet": {
+            "API_BASE": "https://testnodes.wavesnodes.com/",
+            "CHAIN_ID": "T",
+            "SEED": "slight bonus jaguar forum series observe diet seek item faculty labor depend",
+            "timeout": 60000
+        },
+        "mainnet": {
+            "API_BASE": "https://nodes.wavesnodes.com/",
+            "CHAIN_ID": 87,
+            "SEED": "slight bonus jaguar forum series observe diet seek item faculty labor depend",
+            "timeout": 60000
+        }
+    },
+    "defaultEnv": "custom",
+    "mocha": {
+        "timeout": 60000
+    }
+}
