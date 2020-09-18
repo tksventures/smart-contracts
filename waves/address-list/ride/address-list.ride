@@ -1,0 +1,16 @@
+{-# STDLIB_VERSION 4 #-}
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+@Callable(i)
+func register(enable: Boolean) = {
+  let callerAddress = toBase58String(i.caller.bytes)
+  let isRegistered = getBoolean(this, callerAddress)
+  if (isRegistered == enable) then throw("Registration redundancy detected")
+  else [BooleanEntry(callerAddress, enable)]
+}
+
+@Verifier(tx)
+func verify() = false
+
+
