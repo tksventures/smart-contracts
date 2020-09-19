@@ -1,5 +1,5 @@
 # Address List
-_Simple Dapp to Allow any address to add themselves to it_
+_Simple Dapp to Allow any address to add themselves to a list_
 
 ## Usage
 
