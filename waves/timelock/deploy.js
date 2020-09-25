@@ -1,15 +1,9 @@
+/*eslint-disable*/
 const fs = require('fs');
-// 7N8pvtrndGbdWsaPbyULRa7g3ESn21aayVvsz3Q3VVj4
-const seeds = {
-  script: "waves tokes timelock staking dapp test one",
-  testRich: "waves private node seed with waves tokens",
-  testIssuer: "issue some test tokens issue some test tokens",
-  testOwner: "oblige digital primary kiwi decline leave column flag rookie notable enforce summer soul nasty find",
-  testMisc: "misc handler misc handler misc handler misc handler",
-  main: "mv tokes test token snapshot and distribution"
-}
+const seeds = require('./seeds');
+
 const addresses = {
-  owner: address(seeds.main) //"3P584kq8D4QKJSPyqzdV3YeGzYLivyNXFog",
+  owner: address(seeds.main),
 }
 let tokenAssetId = null;
 const wvs = 10 ** 8;
@@ -117,14 +111,18 @@ async function transferToken(assetId, amount, seed, senderSeed = seeds.testIssue
 async function run() {
   tokenAssetId = await loadTokenAssetId();
   console.log(`Asset Loaded: ${tokenAssetId}`);
-  // await transferToken(null, 0.015 * wvs, seeds.script, seeds.main);
-  // await init();
-  // await setOwner(addresses.owner);
-  // await transferToken(tokenAssetId, "10000000000000000", seeds.main, seeds.script);
+  try {
+    await transferToken(null, 0.015 * wvs, seeds.script, seeds.testRich);
+    await init();
+    await setOwner(addresses.owner);
+    await transferToken(tokenAssetId, 142000000000, seeds.main, seeds.testIssuer);
+  } catch (er) {
+    console.log(er);
+  }
   // await transferToken(tokenAssetId, 10000 * wvs, seeds.testOwner);
   // await depositFunds(tokenAssetId, "10000000000000000", seeds.main);
   // await lockFunds(24, 1440, 4320, seeds.main);
-  await withdrawFunds(420, seeds.main);
+  // await withdrawFunds(420, seeds.main);
 }
 
 run();
