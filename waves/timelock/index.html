@@ -1,433 +1,581 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>Timelock Dapp Tool</title>
-    <link crossorigin="anonymous" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"
-          integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" rel="stylesheet">
-    <style>
-        .pure-button {
-            color: white;
-            border-radius: 4px;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            min-width: 100px;
-        }
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Timelock Dapp Tool</title>
+  <link crossorigin="anonymous" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"
+    integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+  <style>
+    .pure-button {
+      color: white;
+      border-radius: 4px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+      min-width: 100px;
+    }
 
-        .pure-label {
-          margin: 2px;
-        }
+    .pure-label {
+      margin: 2px;
+    }
 
-        .button-success,
-        .button-error,
-        .button-warning,
-        .button-secondary {
-            color: white;
-            border-radius: 4px;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        }
+    .button-success,
+    .button-error,
+    .button-warning,
+    .button-secondary {
+      color: white;
+      border-radius: 4px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    }
 
-        .button-success {
-            background: rgb(28, 184, 65); /* this is a green */
-        }
+    .button-success {
+      background: rgb(28, 184, 65);
+      /* this is a green */
+    }
 
-        .button-error {
-            background: rgb(202, 60, 60); /* this is a maroon */
-        }
+    .button-error {
+      background: rgb(202, 60, 60);
+      /* this is a maroon */
+    }
 
-        .button-warning {
-            background: rgb(223, 117, 20); /* this is an orange */
-        }
+    .button-warning {
+      background: rgb(223, 117, 20);
+      /* this is an orange */
+    }
 
-        .button-secondary {
-            background: rgb(66, 184, 221); /* this is a light blue */
-        }
-
-    </style>
+    .button-secondary {
+      background: rgb(66, 184, 221);
+      /* this is a light blue */
+    }
+  </style>
 </head>
+
 <body>
-<div class="pure-g">
+  <div class="pure-g">
 
     <div class="pure-u-1-24"></div>
 
     <div class="pure-u-22-24">
 
-        <div class="pure-u-5-5"></div>
+      <div class="pure-u-5-5"></div>
 
-        <div class="pure-u-5-5">
+      <div class="pure-u-5-5">
 
-            <table class="pure-u-5-5 pure-table pure-table-horizontal">
-                <thead>
-                </thead>
+        <table class="pure-u-5-5 pure-table pure-table-horizontal">
+          <thead>
+          </thead>
 
-                <tbody>
-                <tr>
-                    <td>
-                        <div class="pure-control-group">
-                            <form class="pure-form pure-form-aligned">
-                                <input id="scriptAddress" placeholder="Script address" autocomplete="on" type="text">
-                            </form>
-                        </div>
-                    </td>
-                    <td>
-                      <div class="pure-control-group">
-                          <form class="pure-form pure-form-aligned">
-                              <input id="asset" placeholder="Token Asset ID" autocomplete="on" type="text">
-                          </form>
-                      </div>
-                  </td>
-                    <td>
-                        <form class="pure-form pure-form-aligned">
-                            <input id="keeperAddress" placeholder="WavesKeeper address" readonly type="text">
-                        </form>
-                    </td>
-                    <td>
-                        <form class="pure-form pure-form-aligned">
-                            <input id="hasWaves" placeholder="Waves balance" readonly type="text">
-                        </form>
-                    </td>
-                    <td>
-                        <button style="opacity: 1" disabled class="pure-button button-error" id="keeperStatus" type="button">Keeper status</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="pure-u-5-5"></div>
-
-        <form class="pure-form pure-form-aligned">
-            <fieldset>
+          <tbody>
+            <tr>
+              <td>
                 <div class="pure-control-group">
-                    <input id="withdraw" placeholder="Token amount" type="text">
-                    <button id="withdrawBtn" class="pure-button pure-button-primary" type="button" disabled>Withdraw</button>
-                    <div class="pure-label" id="withdrawAmt">Total Released: </div>
+                  <form class="pure-form pure-form-aligned">
+                    <input id="scriptAddress" placeholder="Dapp Address" autocomplete="on" type="text">
+                  </form>
                 </div>
-
+              </td>
+              <td>
                 <div class="pure-control-group">
-                    <input id="deposit" placeholder="Token amount" type="text">
-                    <button id="depositBtn" class="pure-button pure-button-primary" type="button" disabled>Deposit</button>
-                    <div class="pure-label" id="depositAmt">Total Locked: </div>
+                  <form class="pure-form pure-form-aligned">
+                    <input id="asset" placeholder="Token Asset ID" autocomplete="on" type="text">
+                  </form>
                 </div>
-            </fieldset>
-        </form>
+              </td>
+              <td>
+                <form class="pure-form pure-form-aligned">
+                  <input id="keeperAddress" placeholder="WavesKeeper address" readonly type="text">
+                </form>
+              </td>
+              <td>
+                <form class="pure-form pure-form-aligned">
+                  <input id="hasWaves" placeholder="Waves balance" readonly type="text">
+                </form>
+              </td>
+              <td>
+                <button style="opacity: 1" disabled class="pure-button button-error" id="keeperStatus"
+                  type="button">Keeper status</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        <form class="pure-form pure-form-aligned">
-          <fieldset>
-              <div class="pure-control-group">
-                  <input id="totalChunks" placeholder="Total Chunks" type="text">
-                  <input id="interval" placeholder="Block Interval" type="text">
-                  <input id="initialDelay" placeholder="Initial Delay" type="text">
-              </div>
-              <div class="pure-label" id="chunkEstimate">Blocks until next chunk is released: ...</div>
-              <div class="pure-label" id="timeEstimate">Estimated end date: ...</div>
-              <button id="lockBtn" class="pure-button button-warning" type="button" disabled>!Initiate Lock!</button>
-          </fieldset>
+      <div class="pure-u-5-5"></div>
+
+      <form class="pure-form pure-form-aligned">
+        <div class="pure-label" id="tokenBalance">Wallet Balance: </div>
+        <fieldset>
+          <div class="pure-control-group">
+            <input id="withdraw" placeholder="Token amount" type="text">
+            <button id="withdrawBtn" class="pure-button pure-button-primary" type="button" disabled>Withdraw</button>
+            <div class="pure-label" id="withdrawAmt">Total Released: </div>
+          </div>
+
+          <div class="pure-control-group">
+            <input id="deposit" placeholder="Token amount" type="text">
+            <button id="depositBtn" class="pure-button pure-button-primary" type="button" disabled>Deposit</button>
+            <div class="pure-label" id="depositAmt">Total Locked: </div>
+          </div>
+        </fieldset>
+      </form>
+
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+          <div class="pure-control-group">
+            <input id="totalChunks" placeholder="Total Chunks" type="text">
+            <input id="interval" placeholder="Block Interval" type="text">
+            <input id="initialDelay" placeholder="Initial Delay" type="text">
+          </div>
+          <div class="pure-label" id="chunkEstimate">Blocks until next chunk is released: ...</div>
+          <div class="pure-label" id="nextRelease">Estimated next release: ...</div>
+          <div class="pure-label" id="timeEstimate">Estimated end date: ...</div>
+          <button id="lockBtn" class="pure-button button-warning" type="button" disabled>!Initiate Lock!</button>
+        </fieldset>
       </form>
 
     </div>
     <div class="pure-u-1-24"></div>
-</div>
+  </div>
 
-<script>
+  <script>
 
-  var appData = {};
+    const BLOCK_TIME = 10000;
+    var appData = {};
 
-  function getValueFromKey(targetKey, data = appData.dAppData) {
-    if (!data || !data.length) return null;
-    const accountDataPoint = data.find(({ key, value }) => key === targetKey);
-    return accountDataPoint ? accountDataPoint.value : null;
-  }
+    setInterval(appSync, BLOCK_TIME * .25);
 
-  async function getScriptData() {
-    const res = await fetch(`${appData.node}/addresses/data/${appData.dApp}`);
-    const json = await res.json();
-    appData.dAppData = json;
-    updateScriptLabels();
-  }
+    function getValueFromKey(targetKey, data = appData.dAppData) {
+      if (!data || !data.length) return null;
+      const accountDataPoint = data.find(({ key, value }) => key === targetKey);
+      return accountDataPoint ? accountDataPoint.value : null;
+    }
 
-  async function getHeight() {
-    const res = await fetch(`${appData.node}/blocks/height`);
-    const json = await res.json();
-    appData.height = json.height;
-    updateHeightLabels();
-  }
+    async function getScriptData() {
+      const res = await fetch(`${appData.node}/addresses/data/${appData.dApp}`);
+      const json = await res.json();
+      appData.dAppData = json;
+      updateScriptLabels();
+    }
 
-  function updateScriptLabels() {
-    const lockedAmountLabel = document.querySelector('#depositAmt');
-    lockedAmountLabel.innerHTML = `Total locked: ${getValueFromKey('lockedAmount') || getValueFromKey('storedAmount') || 0}`;
-    const releasedAmountLabel = document.querySelector('#withdrawAmt');
-    releasedAmountLabel.innerHTML = `Total released: ${getValueFromKey('amountClaimed') || 0}`;
-  }
+    async function getHeight() {
+      const res = await fetch(`${appData.node}/blocks/height`);
+      const json = await res.json();
+      appData.height = json.height;
+      updateHeightLabels();
+    }
 
-  function updateHeightLabels() {
-    const blocksRemaining = appData.height - getValueFromKey('lockBlock');
-    const endDateLabel = document.querySelector('#timeEstimate');
-  }
+    async function getTokenBalance() {
+      const res = await fetch(`${appData.node}/assets/balance/${appData.address}/${appData.assetId}`);
+      const json = await res.json();
+      appData.tokenBalance = json.balance / 10 ** 8;
+      updateTokenBalanceLabels();
+    }
 
-  function setStatus(status, text) {
-    var statusBtn = document.querySelector('#keeperStatus');
-    statusBtn.innerHTML = text;
-    statusBtn.className = 'pure-button button-' + status;
-    appData.keeper = status;
-  }
+    function updateScriptLabels() {
+      const lockedAmountLabel = document.querySelector('#depositAmt');
+      const lockedAmount = getValueFromKey('lockedAmount') || getValueFromKey('storedAmount') || 0;
+      const storedAmount = getValueFromKey('storedAmount') || 0
+      lockedAmountLabel.innerHTML = `Total locked: ${storedAmount / 10 ** 8} / ${lockedAmount / 10 ** 8}`;
+      const releasedAmountLabel = document.querySelector('#withdrawAmt');
+      amountClaimed = getValueFromKey('amountClaimed') || 0;
+      releasedAmountLabel.innerHTML = `Total released: ${amountClaimed / 10 ** 8}`;
+    }
 
-  function setAddress(data) {
-    var address = data.account && data.account.address;
-    var addressInp = document.querySelector('#keeperAddress');
-    addressInp.value = address;
-    appData.address = address;
-  }
+    function updateHeightLabels() {
+      const lockBlock = getValueFromKey('lockBlock');
+      const chunks = getValueFromKey('totalChunks');
+      const lockInterval = getValueFromKey('lockInterval');
+      const initialDelay = getValueFromKey('initialDelay');
 
-  function setBalance(data) {
-    var balance = data.account && data.account.balance && data.account.balance.available;
-    var balanceInp = document.querySelector('#hasWaves');
-    var f, s;
+      const height = appData.height || 0;
+      const startBlock = lockBlock + initialDelay;
+      const blocksElapsed = height - startBlock;
+      const chunksElapsed = blocksElapsed / chunks;
+      const nextReleaseBlock = Math.floor(chunksElapsed) * lockInterval + lockInterval + startBlock;
+      const endBlock = startBlock + chunks * lockInterval;
+      const remainingBlocks = endBlock - height;
+      const remainingBlocksToRelease = nextReleaseBlock - height;
+      console.log(Math.floor(chunksElapsed), nextReleaseBlock, height, remainingBlocksToRelease);
 
-    if (balance.length <= 8) {
+      const nextReleaseDate = new Date(Date.now() + remainingBlocksToRelease * BLOCK_TIME);
+      const endDate = new Date(Date.now() + remainingBlocks * BLOCK_TIME);
+
+      const blocksRemainingLabel = document.querySelector('#chunkEstimate');
+      const nextReleaseLabel = document.querySelector('#nextRelease');
+      const endDateLabel = document.querySelector('#timeEstimate');
+
+      if (endBlock > height) {
+        blocksRemainingLabel.innerHTML = `Blocks until next chunk is released: ${remainingBlocksToRelease}`;
+        nextReleaseLabel.innerHTML = `Estimated next release: ${nextReleaseDate.toDateString()} ${nextReleaseDate.toTimeString()}`;
+        endDateLabel.innerHTML = `Estimated end date: ${endDate.toDateString()} ${endDate.toTimeString()}`
+      } else {
+        blocksRemainingLabel.innerHTML = `Current height: ${height}`;
+        nextReleaseLabel.innerHTML = `Blocks since unlock: ${height - endBlock}`;
+        endDateLabel.innerHTML = `Estimated times will display when lock schedule is initiated...`
+      }
+    }
+
+    function updateTokenBalanceLabels() {
+      const balanceLabel = document.querySelector('#tokenBalance');
+      balanceLabel.innerHTML = `Wallet Balance: ${appData.tokenBalance}`;
+    }
+
+    function setStatus(status, text) {
+      const toast = {
+        success: toastr.success,
+        warning: toastr.warning,
+        error: toastr.error,
+        secondary: toastr.info,
+      }[status];
+      toast(text);
+      var statusBtn = document.querySelector('#keeperStatus');
+      statusBtn.innerHTML = text;
+      statusBtn.className = 'pure-button button-' + status;
+      appData.keeper = status;
+    }
+
+    function setAddress(data) {
+      var address = data.account && data.account.address;
+      var addressInp = document.querySelector('#keeperAddress');
+      addressInp.value = address;
+      appData.address = address;
+    }
+
+    function setBalance(data) {
+      var balance = data.account && data.account.balance && data.account.balance.available;
+      var balanceInp = document.querySelector('#hasWaves');
+      var f, s;
+
+      if (balance.length <= 8) {
         s = Number(balance) || 0;
         f = '0';
-    } else {
+      } else {
         s = Number(balance.slice(-8));
         f = Number(balance.slice(0, -8));
+      }
+
+      balanceInp.value = f + '.' + s + ' Waves';
+
+      appData.balance = { f: f, s: s };
     }
 
-    balanceInp.value = f + '.' + s + ' Waves';
+    function setTokenBalance(data) {
+      var balance = appData.tokenBalance;
+      var balanceInp = document.querySelector('#tokenBalance');
+      var f, s;
 
-    appData.balance = { f: f, s: s };
-  }
+      if (balance.length <= 8) {
+        s = Number(balance) || 0;
+        f = '0';
+      } else {
+        s = Number(balance.slice(-8));
+        f = Number(balance.slice(0, -8));
+      }
 
-  function listenKeeper(data) {
-    if (!data.initialized) {
-      setStatus('warning', 'Create waves account');
-      return null;
+      balanceInp.value = f + '.' + s;
     }
 
-    if (data.locked) {
-      setStatus('warning', 'Unlock keeper');
-      return null;
+    function listenKeeper(data) {
+      if (!data.initialized) {
+        setStatus('warning', 'Create waves account');
+        return null;
+      }
+
+      if (data.locked) {
+        setStatus('warning', 'Unlock keeper');
+        return null;
+      }
+
+      appData.node = data.network.server;
+
+      setStatus('success', 'Keeper ready');
+      console.log(data);
+      setAddress(data);
+      checkMetaData();
+      setBalance(data);
+      appSync();
     }
 
-    appData.node = data.network.server;
+    function parseKeeperErrors(error) {
+      let errorText = error.message || 'Error';
+      setStatus('error', errorText);
+    }
 
-    setStatus('success', 'Keeper ready');
-    setAddress(data);
-    setBalance(data);
-    checkDeposit();
-    checkWithdraw();
-  }
-
-  function parseKeeperErrors(error) {
-    let errorText = error.message || 'Error';
-    setStatus('error', errorText);
-  }
-
-  function checkKeeper() {
-    if (!window.WavesKeeper) {
+    function checkKeeper() {
+      let Waves = window.WavesKeeper;
+      console.log(window.WavesKeeper, typeof Waves);
+      if (!window.WavesKeeper) {
         var errorText = 'Install WavesKeeper and restart page';
         setStatus('error', errorText);
+        setTimeout(checkKeeper, 2000);
         return null;
-    }
+      }
 
-    window.WavesKeeper.initialPromise.then(function () {
+      window.WavesKeeper.initialPromise.then(function () {
         window.WavesKeeper.on('update', listenKeeper);
         return window.WavesKeeper.publicState();
-    }).then(
+      }).then(
         listenKeeper,
         parseKeeperErrors
-    )
-  }
+      )
+    }
 
-  function changeScriptAddress() {
-    var addressInp = document.querySelector('#scriptAddress');
-    var address = addressInp.value;
-    appData.dApp = address.trim();
-    getScriptData();
-    getHeight();
-    checkDeposit();
-    checkWithdraw();
-    checkLock();
-  }
+    async function appSync() {
+      if (!appData.dApp) return;
+      await getScriptData();
+      await getHeight();
+      checkDeposit();
+      checkWithdraw();
+      checkLock();
+      await getTokenBalance();
+    }
 
-  function changeAssetId() {
-    var addressInp = document.querySelector('#asset');
-    var address = addressInp.value;
-    appData.assetId = address.trim();
-    checkDeposit();
-    checkWithdraw();
-    checkLock();
-  }
+    function checkMetaData() {
+      const storedScriptAddress = localStorage.getItem('scriptAddress');
+      const storedAssetId = localStorage.getItem('assetId');
 
-  function checkDeposit() {
-    if (!appData.dApp || appData.keeper !== 'success' || !appData.deposit) {
+      if (storedScriptAddress) {
+        document.querySelector('#scriptAddress').value = storedScriptAddress;
+        changeScriptAddress();
+      }
+
+      if (storedAssetId) {
+        document.querySelector('#asset').value = storedAssetId;
+        changeAssetId();
+      }
+    }
+
+    function changeScriptAddress() {
+      var addressInp = document.querySelector('#scriptAddress');
+      var address = addressInp.value;
+      appData.dApp = address.trim();
+      localStorage.setItem('scriptAddress', appData.dApp);
+      appSync();
+    }
+
+    function changeAssetId() {
+      var addressInp = document.querySelector('#asset');
+      var address = addressInp.value;
+      appData.assetId = address.trim();
+      localStorage.setItem('assetId', appData.assetId);
+      appSync();
+    }
+
+    function checkDeposit() {
+      if (!appData.dApp || appData.keeper !== 'success' || !appData.deposit) {
         document.querySelector('#depositBtn').disabled = true;
-    } else {
+      } else {
         document.querySelector('#depositBtn').disabled = null;
+      }
     }
-  }
 
-  function checkWithdraw() {
-    if (!appData.dApp || appData.keeper !== 'success' || !appData.withdraw) {
+    function checkWithdraw() {
+      if (!appData.dApp || appData.keeper !== 'success' || !appData.withdraw) {
         document.querySelector('#withdrawBtn').disabled = true;
-    } else {
+      } else {
         document.querySelector('#withdrawBtn').disabled = null;
+      }
     }
-  }
 
-  function checkLock() {
-    if (!appData.dApp || appData.keeper !== 'success' || !(appData.totalChunks && appData.interval && appData.initialDelay)) {
-        document.querySelector('#lockBtn').disabled = true;
-    } else {
-        document.querySelector('#lockBtn').disabled = null;
+    function checkLock() {
+      const locked = getValueFromKey('locked');
+      const totalChunksInp = document.querySelector('#totalChunks');
+      const intervalInp = document.querySelector('#interval');
+      const initialDelayInp = document.querySelector('#initialDelay');
+      const lockBtn = document.querySelector('#lockBtn');
+
+      if (!appData.dApp || !appData.dAppData || locked ||
+      !(appData.totalChunks && appData.interval && appData.initialDelay)) {
+        lockBtn.disabled = true;
+      } else {
+        lockBtn.disabled = null;
+      }
+
+      if (locked) {
+        const totalChunks = getValueFromKey('totalChunks');
+        const interval = getValueFromKey('lockInterval');
+        const initialDelay = getValueFromKey('initialDelay');
+
+        totalChunksInp.setAttribute('disabled', true);
+        intervalInp.setAttribute('disabled', true);
+        initialDelayInp.setAttribute('disabled', true);
+
+        totalChunksInp.value = `Total Chunks: ${totalChunks}`;
+        intervalInp.value = `Rel Interval: ${interval} Blocks`;
+        initialDelayInp.value = `Initial Delay: ${initialDelay} Blocks`;
+
+        lockBtn.innerHTML = 'Locked!!!';
+      } else {
+        totalChunksInp.removeAttribute('disabled');
+        intervalInp.removeAttribute('disabled');
+        initialDelayInp.removeAttribute('disabled');
+
+        totalChunksInp.value = appData.totalChunks || '';
+        intervalInp.value = appData.interval || '';
+        initialDelayInp.value = appData.initialDelay || '';
+
+        lockBtn.innerHTML = '!Initiate Lock!';
+      }
     }
-  }
 
-  function setDepositAmount() {
-    var amount =  document.querySelector('#deposit').value;
-    appData.deposit = amount;
-    checkDeposit();
-  }
+    function setDepositAmount() {
+      var amount = document.querySelector('#deposit').value;
+      appData.deposit = amount;
+      checkDeposit();
+    }
 
-  function setWithdrawAmount() {
-    var amount =  document.querySelector('#withdraw').value;
-    appData.withdraw = amount;
-    checkWithdraw();
-  }
+    function setWithdrawAmount() {
+      var amount = document.querySelector('#withdraw').value;
+      appData.withdraw = amount;
+      checkWithdraw();
+    }
 
-  function setTotalChunks() {
-    var amount =  document.querySelector('#totalChunks').value;
-    appData.totalChunks = amount;
-    checkLock();
-  }
+    function setTotalChunks() {
+      var amount = document.querySelector('#totalChunks').value;
+      appData.totalChunks = amount;
+      checkLock();
+    }
 
-  function setBlockInterval() {
-    var amount =  document.querySelector('#interval').value;
-    appData.interval = amount;
-    checkLock();
-  }
+    function setBlockInterval() {
+      var amount = document.querySelector('#interval').value;
+      appData.interval = amount;
+      checkLock();
+    }
 
-  function setInitialDelay() {
-    var amount =  document.querySelector('#initialDelay').value;
-    appData.initialDelay = amount;
-    checkLock();
-  }
+    function setInitialDelay() {
+      var amount = document.querySelector('#initialDelay').value;
+      appData.initialDelay = amount;
+      checkLock();
+    }
 
-  document.querySelector('#asset').addEventListener('change', changeAssetId);
-  document.querySelector('#asset').addEventListener('keyup', changeAssetId);
+    document.querySelector('#asset').addEventListener('change', changeAssetId);
+    document.querySelector('#asset').addEventListener('keyup', changeAssetId);
 
-  document.querySelector('#scriptAddress').addEventListener('change', changeScriptAddress);
-  document.querySelector('#scriptAddress').addEventListener('keyup', changeScriptAddress);
+    document.querySelector('#scriptAddress').addEventListener('change', changeScriptAddress);
+    document.querySelector('#scriptAddress').addEventListener('keyup', changeScriptAddress);
 
-  document.querySelector('#totalChunks').addEventListener('change', setTotalChunks);
-  document.querySelector('#totalChunks').addEventListener('keyup', setTotalChunks);
+    document.querySelector('#totalChunks').addEventListener('change', setTotalChunks);
+    document.querySelector('#totalChunks').addEventListener('keyup', setTotalChunks);
 
-  document.querySelector('#interval').addEventListener('change', setBlockInterval);
-  document.querySelector('#interval').addEventListener('keyup', setBlockInterval);
+    document.querySelector('#interval').addEventListener('change', setBlockInterval);
+    document.querySelector('#interval').addEventListener('keyup', setBlockInterval);
 
-  document.querySelector('#initialDelay').addEventListener('change', setInitialDelay);
-  document.querySelector('#initialDelay').addEventListener('keyup', setInitialDelay);
+    document.querySelector('#initialDelay').addEventListener('change', setInitialDelay);
+    document.querySelector('#initialDelay').addEventListener('keyup', setInitialDelay);
 
-  document.querySelector('#deposit').addEventListener('change', setDepositAmount);
-  document.querySelector('#deposit').addEventListener('keyup', setDepositAmount);
+    document.querySelector('#deposit').addEventListener('change', setDepositAmount);
+    document.querySelector('#deposit').addEventListener('keyup', setDepositAmount);
 
-  document.querySelector('#withdraw').addEventListener('change', setWithdrawAmount);
-  document.querySelector('#withdraw').addEventListener('keyup', setWithdrawAmount);
+    document.querySelector('#withdraw').addEventListener('change', setWithdrawAmount);
+    document.querySelector('#withdraw').addEventListener('keyup', setWithdrawAmount);
 
-  window.onload = checkKeeper;
-  setStatus('secondary', 'Wait keeper...');
-</script>
+    window.onload = checkKeeper;
+    setStatus('secondary', 'Loading keeper...');
+  </script>
 
-<script>
-  function lock() {
-    var tx = {
+  <script>
+    function lock() {
+      var tx = {
         type: 16,
         data: {
-            dApp: appData.dApp,
-            call: {
-                function: 'deposit',
-                args: [
-                  { type: 'integer', value: appData.totalChunks },
-                  { type: 'integer', value: appData.interval },
-                  { type: 'integer', value: appData.initialDelay }
-                ]
-            },
-            payment: []
-        }
-    };
-
-    WavesKeeper.signAndPublishTransaction(tx).then(
-        resultOk,
-        resultFail,
-    );
-  }
-
-  document.querySelector('#lockBtn').addEventListener('click', lock);
-</script>
-
-<script>
-  function withdraw() {
-    var tx = {
-        type: 16,
-        data: {
-            dApp: appData.dApp,
-            call: {
-                function: 'withdraw',
-                args: [
-                    {
-                        "type": "integer",
-                        "value": Number(appData.withdraw) * (10 ** 8)
-                    }]
-            },
-            payment: []
-        }
-    };
-
-    WavesKeeper.signAndPublishTransaction(tx).then(
-        resultOk,
-        resultFail,
-    );
-  }
-
-  document.querySelector('#withdrawBtn').addEventListener('click', withdraw);
-</script>
-
-<script>
-  function deposit() {
-    var tx = {
-        type: 16,
-        fee: {
-            "tokens": "0.05",
-            "assetId": "WAVES"
-        },
-        data: {
-            dApp: appData.dApp,
-            call: {
-                function: 'deposit',
-                args: []
-            },
-            payment: [
-                { tokens: appData.deposit, assetId: appData.assetId || null }
+          fee: {
+            tokens: "0.005",
+            assetId: "WAVES"
+          },
+          dApp: appData.dApp,
+          call: {
+            function: 'timelock',
+            args: [
+              { type: 'integer', value: appData.totalChunks },
+              { type: 'integer', value: appData.interval },
+              { type: 'integer', value: appData.initialDelay }
             ]
+          },
+          payment: []
         }
-    };
+      };
 
-    WavesKeeper.signAndPublishTransaction(tx).then(
+      WavesKeeper.signAndPublishTransaction(tx).then(
         resultOk,
         resultFail,
-    );
-  }
+      );
+    }
 
-  document.querySelector('#depositBtn').addEventListener('click', deposit);
-</script>
+    document.querySelector('#lockBtn').addEventListener('click', lock);
+  </script>
 
-<script>
-  function resultOk(data) {
-    alert(JSON.stringify(data));
-  }
-  function resultFail(data) {
-    alert(JSON.stringify(data));
-  }
-</script>
+  <script>
+    function withdraw() {
+      var tx = {
+        type: 16,
+        data: {
+          fee: {
+            tokens: "0.005",
+            assetId: "WAVES"
+          },
+          dApp: appData.dApp,
+          call: {
+            function: 'withdraw',
+            args: [
+              {
+                "type": "integer",
+                "value": Number(appData.withdraw) * (10 ** 8)
+              }]
+          },
+          payment: []
+        }
+      };
+
+      WavesKeeper.signAndPublishTransaction(tx).then(
+        resultOk,
+        resultFail,
+      );
+    }
+
+    document.querySelector('#withdrawBtn').addEventListener('click', withdraw);
+  </script>
+
+  <script>
+    function deposit() {
+      var tx = {
+        type: 16,
+        data: {
+          fee: {
+            tokens: "0.005",
+            assetId: "WAVES"
+          },
+          dApp: appData.dApp,
+          call: {
+            function: 'deposit',
+            args: []
+          },
+          payment: [
+            { tokens: appData.deposit, assetId: appData.assetId || null }
+          ]
+        }
+      };
+
+      window.WavesKeeper.signAndPublishTransaction(tx).then(
+        resultOk,
+        resultFail,
+      );
+    }
+
+    document.querySelector('#depositBtn').addEventListener('click', deposit);
+  </script>
+
+  <script>
+    function resultOk(data) {
+      toastr.success(`Broadcasted Transaction: ${JSON.parse(data).id}`);
+    }
+    function resultFail(data) {
+      toastr.error(JSON.stringify(data));
+    }
+  </script>
 
 </body>
+
 </html>

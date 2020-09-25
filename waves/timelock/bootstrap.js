@@ -1,13 +1,7 @@
+/*eslint-disable*/
 const fs = require('fs');
+const seeds = require('./seeds');
 
-const seeds = {
-  script: "waves tokes timelock dapp test three",
-  testRich: "waves private node seed with waves tokens",
-  testIssuer: "issue some test tokens issue some test tokens",
-  testOwner: "timelock test owner timelock test owner",
-  testMisc: "misc handler misc handler misc handler misc handler",
-  main: "test main test main test main test main"
-}
 let tokenAssetId = null;
 const wvs = 10 ** 8;
 

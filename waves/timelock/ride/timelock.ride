@@ -1,8 +1,8 @@
-{-# STDLIB_VERSION 3 #-}
+{-# STDLIB_VERSION 4 #-}
 {-# CONTENT_TYPE DAPP #-}
 {-# SCRIPT_TYPE ACCOUNT #-}
 
-let assetId = base58'7N8pvtrndGbdWsaPbyULRa7g3ESn21aayVvsz3Q3VVj4'
+let assetId = base58'3NiqqZGGzarP8oQFrZwwdz2SorH9aVbjDFXxjSSRy3xP'
 let oneMonth = 43800 # the number of blocks in ~1 month
 let accessDeniedMessage = "Only the timelock owner can call this function"
 
@@ -33,14 +33,12 @@ func settleWithdrawal(amount: Int, shouldUnlock: Boolean) = {
         then throw("Can't withdraw negative amount")
     else if (newAmount < 0)
         then throw("Not enough balance")
-    else ScriptResult(
-            WriteSet([
-                DataEntry("locked", !shouldUnlock),
-                DataEntry("storedAmount", newAmount),
-                DataEntry("amountClaimed", amountClaimed + amount)
-            ]),
-            TransferSet([ScriptTransfer(addressFromStringValue(owner()), amount, assetId)])
-        )
+    else [
+            BooleanEntry("locked", !shouldUnlock),
+            IntegerEntry("storedAmount", newAmount),
+            IntegerEntry("amountClaimed", amountClaimed + amount),
+            ScriptTransfer(addressFromStringValue(owner()), amount, assetId)
+          ]
 }
 
 @Callable(i)
@@ -52,13 +50,16 @@ func deposit() = {
 
     if (locked == true) then throw("Can't deposit funds after it is locked")
     else {
-        let pmt = extract(i.payment)
-        if (pmt.assetId != assetId) then throw("Only the predefined asset can be locked")
-        else {
-            let storedAmount = getInt("storedAmount")
-            let newAmount = storedAmount + pmt.amount
-            WriteSet([DataEntry("storedAmount", newAmount)])
-        }
+      if (size(i.payments) <= 0) then throw("Missing attached payment")
+      else {
+          let pmt = i.payments[0];
+          if (pmt.assetId != assetId) then throw("Only the predefined asset can be locked")
+          else {
+              let storedAmount = getInt("storedAmount")
+              let newAmount = storedAmount + pmt.amount
+              [IntegerEntry("storedAmount", newAmount)]
+          }
+      }
     }
 }
 
@@ -79,15 +80,15 @@ func timelock(chunks: Int, interval: Int, initialDelay: Int) = {
                 let storedAmount = getInt("storedAmount");
                 if (storedAmount < chunks) then throw("There are not enough funds to lock")
                 else {
-                    WriteSet([
-                        DataEntry("locked", true),
-                        DataEntry("lockBlock", height),
-                        DataEntry("initialDelay", initialDelay),
-                        DataEntry("lockInterval", interval),
-                        DataEntry("totalChunks", chunks),
-                        DataEntry("lockedAmount", storedAmount),
-                        DataEntry("amountClaimed", 0)
-                    ])
+                    [
+                      BooleanEntry("locked", true),
+                      IntegerEntry("lockBlock", height),
+                      IntegerEntry("initialDelay", initialDelay),
+                      IntegerEntry("lockInterval", interval),
+                      IntegerEntry("totalChunks", chunks),
+                      IntegerEntry("lockedAmount", storedAmount),
+                      IntegerEntry("amountClaimed", 0)
+                    ]
                 }
             }
         }
@@ -114,10 +115,10 @@ func withdraw(amount: Int) = {
 
         let startingBlock = lockBlock + initialDelay
         let blocksElapsed = height - startingBlock
-        let chunksElapsed = blocksElapsed / lockInterval
+        let chunksElapsed = min([blocksElapsed / lockInterval, totalChunks])
         let amountPerChunk = lockedAmount / totalChunks
         let amountAvailable = amountPerChunk * chunksElapsed
-        let withdrawalAmount = amountAvailable - amountClaimed;
+        let withdrawalAmount = amountAvailable - amountClaimed
 
         if (withdrawalAmount <= 0) then throw("All funds are currently locked")
         else settleWithdrawal(withdrawalAmount, chunksElapsed >= totalChunks)
