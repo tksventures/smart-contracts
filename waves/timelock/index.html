@@ -176,29 +176,35 @@
 
     function updateScriptLabels() {
       const lockedAmountLabel = document.querySelector('#depositAmt');
-      const lockedAmount = getValueFromKey('lockedAmount') || getValueFromKey('storedAmount') || 0;
-      const storedAmount = getValueFromKey('storedAmount') || 0
-      lockedAmountLabel.innerHTML = `Total locked: ${storedAmount / 10 ** 8} / ${lockedAmount / 10 ** 8}`;
+      const lockString = getValueFromKey('locked') ? 'locked' : 'waiting to be locked';
+      const lockedAmount = getValueFromKey('locked') ? getValueFromKey('lockedAmount') : (getValueFromKey('storedAmount') || 0);
+      const storedAmount = getValueFromKey('storedAmount') || 0;
+      lockedAmountLabel.innerHTML = `Total ${lockString}: ${storedAmount / 10 ** 8} / ${lockedAmount / 10 ** 8}`;
       const releasedAmountLabel = document.querySelector('#withdrawAmt');
       amountClaimed = getValueFromKey('amountClaimed') || 0;
       releasedAmountLabel.innerHTML = `Total released: ${amountClaimed / 10 ** 8}`;
     }
 
     function updateHeightLabels() {
-      const lockBlock = getValueFromKey('lockBlock');
-      const chunks = getValueFromKey('totalChunks');
-      const lockInterval = getValueFromKey('lockInterval');
-      const initialDelay = getValueFromKey('initialDelay');
-
       const height = appData.height || 0;
+      const locked = getValueFromKey('locked');
+
+      const chunksInput = appData.totalChunks || getValueFromKey('totalChunks');
+      const intervalInput = parseInt(appData.interval) || getValueFromKey('lockInterval')
+      const initialDelayInput = parseInt(appData.initialDelay) || getValueFromKey('initialDelay');
+
+      const chunks = locked ? getValueFromKey('totalChunks') : chunksInput;
+      const lockInterval = locked ? getValueFromKey('lockInterval') : intervalInput;
+      const initialDelay = locked ? getValueFromKey('initialDelay') : initialDelayInput;
+      const lockBlock = locked ? getValueFromKey('lockBlock') : height;
+
       const startBlock = lockBlock + initialDelay;
-      const blocksElapsed = height - startBlock;
-      const chunksElapsed = blocksElapsed / chunks;
-      const nextReleaseBlock = Math.floor(chunksElapsed) * lockInterval + lockInterval + startBlock;
+      const blocksElapsed = Math.max(height - startBlock, 0);
+      const chunksElapsed = Math.floor(blocksElapsed / lockInterval);
+      const nextReleaseBlock = chunksElapsed * lockInterval + lockInterval + startBlock;
       const endBlock = startBlock + chunks * lockInterval;
       const remainingBlocks = endBlock - height;
       const remainingBlocksToRelease = nextReleaseBlock - height;
-      console.log(Math.floor(chunksElapsed), nextReleaseBlock, height, remainingBlocksToRelease);
 
       const nextReleaseDate = new Date(Date.now() + remainingBlocksToRelease * BLOCK_TIME);
       const endDate = new Date(Date.now() + remainingBlocks * BLOCK_TIME);
