@@ -119,10 +119,6 @@ async function run() {
   } catch (er) {
     console.log(er);
   }
-  // await transferToken(tokenAssetId, 10000 * wvs, seeds.testOwner);
-  // await depositFunds(tokenAssetId, "10000000000000000", seeds.main);
-  // await lockFunds(24, 1440, 4320, seeds.main);
-  // await withdrawFunds(420, seeds.main);
 }
 
 run();
