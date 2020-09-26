@@ -29,7 +29,26 @@ _Dependencies_:
 _Unlike most testing suites, the timelock test suite waits for blocks to elapse in real-time.. Mocked functions/values were avoided to keep all transactions included in the unit tests as explorable on-chain data.
 The unit tests will connect to a local node running on the machine (where the dApp was deployed) to check block height as needed._
 
-- run `surfboard test` from the `waves` directory
+- run `surfboard test` from the `timelock` directory
+
+#### Testing with Timelock Utility
+
+_Dependencies_:
+- [surfboard](https://www.npmjs.com/package/@waves/surfboard)
+- [waves-private-node](https://hub.docker.com/r/wavesplatform/waves-private-node)
+- [http-server](https://www.npmjs.com/package/http-server)
+- [Waves Keeper](https://docs.waves.tech/en/ecosystem/waves-keeper/getting-started-with-keeper)
+
+- Activate your private local node
+- From the `timelock` directory:
+  - bootstrap accounts with `surfboard run bootstrap`
+  - copy the generated Asset ID from the `asset.db` file
+  - in `timelock.ride`, update this line with your Asset ID: `let assetId = base58'<GENERATED_ASSET_ID>'`
+  - deploy the dapp with `surfboard run deploy`
+  - run `http-server` and open the generated link
+- Unlock Waves Keeper
+- Input the deployed Dapp Address and Asset ID
+- Test!
 
 ## Credits
 

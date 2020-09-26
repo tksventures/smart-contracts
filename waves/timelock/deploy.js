@@ -2,6 +2,8 @@
 const fs = require('fs');
 const seeds = require('./seeds');
 
+const { log } = console;
+
 const addresses = {
   owner: address(seeds.main),
 }
@@ -11,7 +13,7 @@ const wvs = 10 ** 8;
 async function loadTokenAssetId() {
   return new Promise((resolve) => {
     fs.readFile('asset.db', (er, data) => {
-      if (er) { console.log(er); resolve(null); }
+      if (er) { log(er); resolve(null); }
       resolve(data.toString());
     });
   })
@@ -25,9 +27,9 @@ async function init() {
     const result = await broadcast(ssTx);
     const conf = await waitForTx(ssTx.id);
   
-    console.log(result, conf);
+    log(result, conf);
   } catch (er) {
-    console.log("ERROR!", er);
+    log("ERROR!", er);
   }
 }
 
@@ -42,7 +44,7 @@ async function setOwner(ownerAddress) {
   const result = await broadcast(changeOwner);
   const conf = await waitForTx(changeOwner.id);
 
-  console.log(result, conf);
+  log(result, conf);
 }
 
 async function depositFunds(assetId, amount, senderSeed) {
@@ -56,7 +58,7 @@ async function depositFunds(assetId, amount, senderSeed) {
   const result = await broadcast(tx);
   const conf = await waitForTx(tx.id);
 
-  console.log(result, conf);
+  log(result, conf);
 }
 
 async function withdrawFunds(amount, senderSeed = seeds.testOwner) {
@@ -72,7 +74,7 @@ async function withdrawFunds(amount, senderSeed = seeds.testOwner) {
   const result = await broadcast(tx);
   const conf = await waitForTx(tx.id);
 
-  console.log(result, conf);
+  log(result, conf);
 }
 
 async function lockFunds(totalChunks, interval, initialDelay, seed = seeds.testOwner) {
@@ -91,7 +93,7 @@ async function lockFunds(totalChunks, interval, initialDelay, seed = seeds.testO
   const result = await broadcast(tx);
   const conf = await waitForTx(tx.id);
 
-  console.log(result, conf);
+  log(result, conf);
 }
 
 async function transferToken(assetId, amount, seed, senderSeed = seeds.testIssuer) {
@@ -105,19 +107,19 @@ async function transferToken(assetId, amount, seed, senderSeed = seeds.testIssue
   const result = await broadcast(tx);
   const conf = await waitForTx(tx.id);
 
-  console.log(result, conf);
+  log(result, conf);
 }
 
 async function run() {
   tokenAssetId = await loadTokenAssetId();
-  console.log(`Asset Loaded: ${tokenAssetId}`);
+  log(`Asset Loaded: ${tokenAssetId}`);
   try {
     await transferToken(null, 0.015 * wvs, seeds.script, seeds.testRich);
     await init();
     await setOwner(addresses.owner);
     await transferToken(tokenAssetId, 142000000000, seeds.main, seeds.testIssuer);
   } catch (er) {
-    console.log(er);
+    log(er);
   }
 }
 
