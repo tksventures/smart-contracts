@@ -222,7 +222,6 @@ describe('Timelock test suite', async function () {
           function: 'withdraw',
           args: [{ type: 'integer', value: 42 * wvs }],
         },
-
       };
 
       await waitUntilBlock(lockBlock + (interval * totalChunks) + initialDelay);
